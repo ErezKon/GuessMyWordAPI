@@ -1,0 +1,10 @@
+version: "3"
+services:
+  adbapi:
+    container_name: guess-my-word-api
+    #image: erezkon/adb-api:1
+    build: .
+    restart: always
+    ports:
+      - "5123:5123"
+      - "7123:7123"
