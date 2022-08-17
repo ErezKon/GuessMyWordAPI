@@ -19,6 +19,7 @@ namespace GuessMyWordAPI.DataLayer
         {
             // connect to mysql with connection string from app settings
             var connectionString = Configuration.GetConnectionString("WebApiDatabase");
+            Console.WriteLine($"Connection-String: {connectionString}");
             options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         }
 

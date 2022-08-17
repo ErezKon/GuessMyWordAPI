@@ -17,15 +17,15 @@ namespace GuessMyWordAPI.Controllers
         }
 
         [HttpGet("GetWord")]
-        public WordVM GetWord(WordVM word)
+        public WordVM GetWord(long? id, string? guid)
         {
-            if(word.ID.HasValue)
+            if(id.HasValue)
             {
-                return new WordVM(_wordService.GetWordById(word.ID.Value));
+                return new WordVM(_wordService.GetWordById(id.Value));
             } 
             else
             {
-                return new WordVM(_wordService.GetWordByGuid(word.Guid));
+                return new WordVM(_wordService.GetWordByGuid(Guid.Parse(guid)));
             }
         }
 

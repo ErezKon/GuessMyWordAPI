@@ -15,6 +15,17 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IWordService, WordService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllPolicy",
+        policy =>
+    {
+        policy.AllowAnyOrigin();
+        policy.AllowAnyMethod();
+        policy.AllowAnyHeader();
+    });
+});
+
 builder.Services.AddDbContext<WordContext>(options =>
 {
 
@@ -29,14 +40,13 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 builder.WebHost.UseKestrel(kestrel =>
 {
     kestrel.Listen(IPAddress.Any, 5123);
-    kestrel.Listen(IPAddress.Any, 7123);
 });
 var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
