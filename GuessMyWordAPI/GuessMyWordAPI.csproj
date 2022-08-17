@@ -6,8 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>904b3f1e-6303-4e36-9ec8-e6069c4b6f38</UserSecretsId>
     <DockerfileContext>.</DockerfileContext>
-    <PublishSingleFile>true</PublishSingleFile>
-    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>

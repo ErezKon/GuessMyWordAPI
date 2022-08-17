@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.HttpOverrides;
+using System.Net;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,19 +10,32 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.KnownProxies.Add(IPAddress.Parse("192.168.1.18"));
+    options.KnownProxies.Add(IPAddress.Parse("213.57.171.199"));
+});
+
+builder.WebHost.UseKestrel(kestrel =>
+{
+    kestrel.Listen(IPAddress.Any, 5123);
+    kestrel.Listen(IPAddress.Any, 7123);
+});
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 app.Run();
