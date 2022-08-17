@@ -4,11 +4,11 @@ using GuessMyWordAPI.Models;
 
 namespace GuessMyWordAPI.Services
 {
-    public class WordsService : IWordService
+    public class WordService : IWordService
     {
         private readonly WordContext _wordDB;
         private readonly Random _random;
-        public WordsService(IConfiguration config)
+        public WordService(IConfiguration config)
         {
             _wordDB = new WordContext(config);
             _random = new Random();
