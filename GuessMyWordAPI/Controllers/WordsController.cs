@@ -36,7 +36,7 @@ namespace GuessMyWordAPI.Controllers
         }
 
 
-        [HttpGet("AddWord")]
+        [HttpPost("AddWord")]
         public WordVM AddWord(WordVM word)
         {
             return new WordVM(_wordService.AddWord(new WordModel
