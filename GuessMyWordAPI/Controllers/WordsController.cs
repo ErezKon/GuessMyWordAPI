@@ -1,4 +1,6 @@
-﻿using GuessMyWordAPI.ViewModels;
+﻿using GuessMyWordAPI.IServices;
+using GuessMyWordAPI.Models;
+using GuessMyWordAPI.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,28 +10,40 @@ namespace GuessMyWordAPI.Controllers
     [ApiController]
     public class WordsController : ControllerBase
     {
+        private readonly IWordService _wordService;
+        public WordsController(IWordService wordService)
+        {
+            _wordService = wordService;
+        }
+
         [HttpGet("GetWord")]
         public WordVM GetWord(WordVM word)
         {
-            return word;
+            if(word.ID.HasValue)
+            {
+                return new WordVM(_wordService.GetWordById(word.ID.Value));
+            } 
+            else
+            {
+                return new WordVM(_wordService.GetWordByGuid(word.Guid));
+            }
         }
 
         [HttpGet("GetRandomWord")]
-        public WordVM GetRandomWord(string language)
+        public WordVM GetRandomWord(string language, int? length)
         {
-            return new WordVM
-            {
-                ID = Guid.NewGuid(),
-                Language = language,
-                Word = "Test Word"
-            };
+            return new WordVM(_wordService.GetRandomWord(language, length));
         }
 
 
         [HttpGet("AddWord")]
         public WordVM AddWord(WordVM word)
         {
-            return word;
+            return new WordVM(_wordService.AddWord(new WordModel
+            {
+                Language = word.Language,
+                Word = word.Word
+            }));
         }
     }
 }

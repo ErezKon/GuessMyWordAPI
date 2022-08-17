@@ -1,3 +1,4 @@
+using GuessMyWordAPI.DataLayer;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Net;
 
@@ -9,6 +10,11 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<WordContext>(options =>
+{
+
+});
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
