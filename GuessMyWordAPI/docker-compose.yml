@@ -5,6 +5,8 @@ services:
     #image: erezkon/adb-api:1
     build: .
     restart: always
+    volumes:
+      - ./Logs:/app/Logs
     ports:
       - "5123:5123"
       - "7123:7123"
