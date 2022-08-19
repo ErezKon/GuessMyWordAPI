@@ -15,11 +15,17 @@ namespace GuessMyWordAPI.Services
         }
         public WordModel AddWord(WordModel word)
         {
-            word.Guid = Guid.NewGuid();
             if (string.IsNullOrWhiteSpace(word.Language) || string.IsNullOrWhiteSpace(word.Word))
             {
                 throw new ArgumentNullException("Missing data, Language/Word");
             }
+            var existingWord = _wordDB.Words
+                .FirstOrDefault(w => w.Language.Equals(word.Language) && w.Word.Equals(word.Word));
+            if(existingWord != null)
+            {
+                return existingWord;
+            }
+            word.Guid = Guid.NewGuid();
             word.Language = word.Language.ToLower();
             word.Word = word.Word.ToUpper();
             _wordDB.Add(word);

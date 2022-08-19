@@ -1,5 +1,6 @@
 ﻿using GuessMyWordAPI.IServices;
 using GuessMyWordAPI.Models;
+using GuessMyWordAPI.Services;
 using GuessMyWordAPI.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,13 @@ namespace GuessMyWordAPI.Controllers
     public class WordsController : ControllerBase
     {
         private readonly IWordService _wordService;
-        public WordsController(IWordService wordService)
+        private readonly IMyLogger _myLogger;
+        public WordsController(IWordService wordService, IMyLogger myLogger)
         {
             _wordService = wordService;
+            _myLogger = myLogger;
         }
+
 
         [HttpGet("GetWord")]
         public WordVM GetWord(long? id, string? guid)
@@ -37,7 +41,7 @@ namespace GuessMyWordAPI.Controllers
 
 
         [HttpPost("AddWord")]
-        public WordVM AddWord(WordVM word)
+        public WordVM AddWord([FromBody] WordVM word)
         {
             return new WordVM(_wordService.AddWord(new WordModel
             {
