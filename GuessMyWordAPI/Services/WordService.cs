@@ -1,6 +1,7 @@
 ﻿using GuessMyWordAPI.DataLayer;
 using GuessMyWordAPI.IServices;
 using GuessMyWordAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace GuessMyWordAPI.Services
 {
@@ -48,19 +49,29 @@ namespace GuessMyWordAPI.Services
             return lst[_random.Next(lst.Count)];
         }
 
-        public WordModel GetWordByGuid(Guid wordGuid)
+        public WordModel GetWordByGuid(Guid wordGuid, bool withMetada = false)
         {
 #pragma warning disable CS8603 // Possible null reference return.
-            return _wordDB
+            return withMetada ?
+                _wordDB
+                .Words
+                .Include(w => w.Metadata)
+                .FirstOrDefault(w => w.Guid.Equals(wordGuid)) :
+                _wordDB
                 .Words
                 .FirstOrDefault(w => w.Guid.Equals(wordGuid));
 #pragma warning restore CS8603 // Possible null reference return.
         }
 
-        public WordModel GetWordById(long wordId)
+        public WordModel GetWordById(long wordId, bool withMetada = false)
         {
 #pragma warning disable CS8603 // Possible null reference return.
-            return _wordDB
+            return withMetada ?
+                _wordDB
+                .Words
+                .Include(w => w.Metadata)
+                .FirstOrDefault(w => w.ID == wordId) :
+                _wordDB
                 .Words
                 .FirstOrDefault(w => w.ID == wordId);
 #pragma warning restore CS8603 // Possible null reference return.

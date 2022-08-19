@@ -21,15 +21,15 @@ namespace GuessMyWordAPI.Controllers
 
 
         [HttpGet("GetWord")]
-        public WordVM GetWord(long? id, string? guid)
+        public WordVM GetWord(long? id, string? guid, bool withMetadata = false)
         {
             if(id.HasValue)
             {
-                return new WordVM(_wordService.GetWordById(id.Value));
+                return new WordVM(_wordService.GetWordById(id.Value, withMetadata));
             } 
             else
             {
-                return new WordVM(_wordService.GetWordByGuid(Guid.Parse(guid)));
+                return new WordVM(_wordService.GetWordByGuid(Guid.Parse(guid), withMetadata));
             }
         }
 
