@@ -8,12 +8,23 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<HttpLoggerActionFilter>();
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IWordService, WordService>();
+builder.Services.AddSingleton<IMyLogger, MyLogger>();
+
+builder.Host.ConfigureLogging(logging =>
+{
+    logging.ClearProviders();
+    logging.AddConsole();
+});
 
 builder.Services.AddCors(options =>
 {
@@ -48,10 +59,17 @@ app.UseSwaggerUI();
 
 //app.UseHttpsRedirection();
 
+app.Use((context, next) =>
+{
+    context.Request.EnableBuffering();
+    return next();
+});
+
 app.UseAuthorization();
 
 app.MapControllers();
 
+app.UseHttpLogging();
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
