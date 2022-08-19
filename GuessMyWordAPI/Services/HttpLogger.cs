@@ -105,7 +105,7 @@ namespace GuessMyWordAPI.Services
                 Directory.CreateDirectory(logsDir);
             }
             path = Path.Combine(logsDir, $"{action}-{DateTime.Now:ddMMyyyy.HHmmss.fff}.txt");
-            _logger.Info("Creating HTTP Log.");
+            _logger.Info($"Creating HTTP Log at path: {path}");
             try
             {
                 var file = File.Create(path);
