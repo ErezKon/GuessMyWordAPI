@@ -1,6 +1,6 @@
 version: "3"
 services:
-  adbapi:
+ guessmyword:
     container_name: guess-my-word-api
     #image: erezkon/adb-api:1
     build: .
