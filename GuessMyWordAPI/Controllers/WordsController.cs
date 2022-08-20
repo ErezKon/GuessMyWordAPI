@@ -43,11 +43,13 @@ namespace GuessMyWordAPI.Controllers
         [HttpPost("AddWord")]
         public WordVM AddWord([FromBody] WordVM word)
         {
-            return new WordVM(_wordService.AddWord(new WordModel
-            {
-                Language = word.Language,
-                Word = word.Word
-            }));
+            return new WordVM(_wordService.AddWord(word.Language, word.Word));
+        }
+
+        [HttpPost("SolveWord")]
+        public WordVM SolveWord(SolveWordVM word)
+        {
+            return new WordVM(_wordService.SolveWord(word.ID, word.SolveIndex));
         }
     }
 }

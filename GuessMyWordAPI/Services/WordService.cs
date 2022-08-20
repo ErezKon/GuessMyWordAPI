@@ -9,29 +9,43 @@ namespace GuessMyWordAPI.Services
     {
         private readonly WordContext _wordDB;
         private readonly Random _random;
+        private readonly int maxTries = 6;
         public WordService(IConfiguration config)
         {
             _wordDB = new WordContext(config);
             _random = new Random();
         }
-        public WordModel AddWord(WordModel word)
+        public WordModel AddWord(string language, string word)
         {
-            if (string.IsNullOrWhiteSpace(word.Language) || string.IsNullOrWhiteSpace(word.Word))
+            if (string.IsNullOrWhiteSpace(language) || string.IsNullOrWhiteSpace(word))
             {
                 throw new ArgumentNullException("Missing data, Language/Word");
             }
             var existingWord = _wordDB.Words
-                .FirstOrDefault(w => w.Language.Equals(word.Language) && w.Word.Equals(word.Word));
+                .FirstOrDefault(w => w.Language.Equals(language) && w.Word.Equals(word));
             if(existingWord != null)
             {
                 return existingWord;
             }
-            word.Guid = Guid.NewGuid();
-            word.Language = word.Language.ToLower();
-            word.Word = word.Word.ToUpper();
-            _wordDB.Add(word);
+            var wordModel = new WordModel
+            {
+                Guid = Guid.NewGuid(),
+                Language = language.ToLower(),
+                Word = word.ToUpper()
+            };
+            _wordDB.Add(wordModel);
             _wordDB.SaveChanges();
-            return word;
+            for (int i = 0; i <= maxTries; i++)
+            {
+                wordModel.Metadata.Add(new WordMetadata
+                    {
+                        WordId = wordModel.ID,
+                        SolveCount = 0,
+                        SolveIndex = i,
+                    });
+            }
+            _wordDB.SaveChanges();
+            return wordModel;
         }
 
         public WordModel GetRandomWord(string language, int? length)
@@ -79,7 +93,21 @@ namespace GuessMyWordAPI.Services
 
         public WordModel SolveWord(long wordId, int tries)
         {
-            throw new NotImplementedException();
+            var word = _wordDB
+                .Words
+                .Include(w => w.Metadata)
+                .FirstOrDefault(w => w.ID == wordId);
+            if(word != null)
+            {
+                var meta = word.Metadata
+                    .FirstOrDefault(m => m.SolveIndex == tries);
+                if(meta != null)
+                {
+                    meta.SolveCount++;
+                    _wordDB.SaveChanges();
+                }
+            }
+            return word;
         }
     }
 }
