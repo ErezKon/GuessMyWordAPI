@@ -8,6 +8,7 @@ namespace GuessMyWordAPI.ViewModels
         public Guid Guid { get; set; }
         public string Word { get; set; }
         public string Language { get; set; }
+        public string? Description { get; set; }
         public List<SolveWordVM> Solved { get; set; }
 
         public WordVM()

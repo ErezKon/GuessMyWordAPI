@@ -9,21 +9,24 @@ namespace GuessMyWordAPI.Services
     {
         private readonly WordContext _wordDB;
         private readonly Random _random;
+        private readonly IConfiguration _config;
         private readonly int maxTries = 6;
         public WordService(IConfiguration config)
         {
-            _wordDB = new WordContext(config);
+            //_wordDB = new WordContext(config);
             _random = new Random();
+            _config = config;
         }
-        public WordModel AddWord(string language, string word)
+        public WordModel AddWord(string language, string word, string? description = null)
         {
             if (string.IsNullOrWhiteSpace(language) || string.IsNullOrWhiteSpace(word))
             {
                 throw new ArgumentNullException("Missing data, Language/Word");
             }
-            var existingWord = _wordDB.Words
-                .FirstOrDefault(w => w.Language.Equals(language) && w.Word.Equals(word));
-            if(existingWord != null)
+            using var context = new WordContext(_config);
+            var existingWord = context.Words
+            .FirstOrDefault(w => w.Language.Equals(language) && w.Word.Equals(word));
+            if (existingWord != null)
             {
                 return existingWord;
             }
@@ -33,27 +36,33 @@ namespace GuessMyWordAPI.Services
                 Language = language.ToLower(),
                 Word = word.ToUpper()
             };
-            _wordDB.Add(wordModel);
-            _wordDB.SaveChanges();
+            if(!string.IsNullOrWhiteSpace(description))
+            {
+                wordModel.Description = description;
+            }
+            context.Add(wordModel);
+            context.SaveChanges();
+            wordModel.Metadata = new List<WordMetadata>();
             for (int i = 0; i <= maxTries; i++)
             {
                 wordModel.Metadata.Add(new WordMetadata
-                    {
-                        WordId = wordModel.ID,
-                        SolveCount = 0,
-                        SolveIndex = i,
-                    });
+                {
+                    WordId = wordModel.ID,
+                    SolveCount = 0,
+                    SolveIndex = i,
+                });
             }
-            _wordDB.SaveChanges();
+            context.SaveChanges();
             return wordModel;
         }
 
         public WordModel GetRandomWord(string language, int? length)
         {
+            using var context = new WordContext(_config);
             var lang = language.ToLower();
-            var query = _wordDB.Words
+            var query = context.Words
                 .Where(w => w.Language.Equals(lang));
-            if(length.HasValue && length.Value > 0)
+            if (length.HasValue && length.Value > 0)
             {
                 query = query
                     .Where(w => w.Word.Length == length.Value);
@@ -63,15 +72,16 @@ namespace GuessMyWordAPI.Services
             return lst[_random.Next(lst.Count)];
         }
 
-        public WordModel GetWordByGuid(Guid wordGuid, bool withMetada = false)
+        public WordModel GetWordByGuid(Guid wordGuid, bool withMetadata = false)
         {
 #pragma warning disable CS8603 // Possible null reference return.
-            return withMetada ?
-                _wordDB
+            using var context = new WordContext(_config);
+            return withMetadata ?
+                context
                 .Words
                 .Include(w => w.Metadata)
                 .FirstOrDefault(w => w.Guid.Equals(wordGuid)) :
-                _wordDB
+                context
                 .Words
                 .FirstOrDefault(w => w.Guid.Equals(wordGuid));
 #pragma warning restore CS8603 // Possible null reference return.
@@ -79,13 +89,14 @@ namespace GuessMyWordAPI.Services
 
         public WordModel GetWordById(long wordId, bool withMetada = false)
         {
+            using var context = new WordContext(_config);
 #pragma warning disable CS8603 // Possible null reference return.
             return withMetada ?
-                _wordDB
+                context
                 .Words
                 .Include(w => w.Metadata)
                 .FirstOrDefault(w => w.ID == wordId) :
-                _wordDB
+                context
                 .Words
                 .FirstOrDefault(w => w.ID == wordId);
 #pragma warning restore CS8603 // Possible null reference return.
@@ -93,7 +104,8 @@ namespace GuessMyWordAPI.Services
 
         public WordModel SolveWord(long wordId, int tries)
         {
-            var word = _wordDB
+            using var context = new WordContext(_config);
+            var word = context
                 .Words
                 .Include(w => w.Metadata)
                 .FirstOrDefault(w => w.ID == wordId);
@@ -104,7 +116,7 @@ namespace GuessMyWordAPI.Services
                 if(meta != null)
                 {
                     meta.SolveCount++;
-                    _wordDB.SaveChanges();
+                    context.SaveChanges();
                 }
             }
             return word;

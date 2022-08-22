@@ -26,9 +26,10 @@ builder.Host.ConfigureLogging(logging =>
     logging.AddConsole();
 });
 
+var corsPolicy = "AllPolicy";
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllPolicy",
+    options.AddPolicy(corsPolicy,
         policy =>
     {
         policy.AllowAnyOrigin();
@@ -48,16 +49,33 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Add(IPAddress.Parse("213.57.171.199"));
 });
 
-builder.WebHost.UseKestrel(kestrel =>
+if (!builder.Environment.IsDevelopment())
 {
-    kestrel.Listen(IPAddress.Any, 5123);
-});
+    builder.Services.AddHttpsRedirection(options =>
+    {
+        options.RedirectStatusCode = (int)HttpStatusCode.PermanentRedirect;
+        options.HttpsPort = 443;
+    });
+} 
+else
+{
+    builder.Services.AddHttpsRedirection(options =>
+    {
+        options.RedirectStatusCode = (int)HttpStatusCode.TemporaryRedirect;
+        options.HttpsPort = 5001;
+    });
+}
+
+//builder.WebHost.UseKestrel(kestrel =>
+//{
+//    kestrel.Listen(IPAddress.Any, 5123);
+//    kestrel.Listen(IPAddress.Any, 7123);
+//});
+
 var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
-//app.UseHttpsRedirection();
 
 app.Use((context, next) =>
 {
@@ -70,6 +88,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseHttpLogging();
+app.UseHttpsRedirection();
+app.UseHsts();
+
+app.UseCors(corsPolicy);
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {

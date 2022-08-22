@@ -14,6 +14,7 @@ namespace GuessMyWordAPI.Models
         public string? Language { get; set; }
         [Required]
         public string? Word { get; set; }
+        public string? Description { get; set; }
 
         public List<WordMetadata> Metadata { get; set; }
     }

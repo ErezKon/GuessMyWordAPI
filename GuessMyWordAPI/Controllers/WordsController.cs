@@ -43,7 +43,7 @@ namespace GuessMyWordAPI.Controllers
         [HttpPost("AddWord")]
         public WordVM AddWord([FromBody] WordVM word)
         {
-            return new WordVM(_wordService.AddWord(word.Language, word.Word));
+            return new WordVM(_wordService.AddWord(word.Language, word.Word, word.Description));
         }
 
         [HttpPost("SolveWord")]

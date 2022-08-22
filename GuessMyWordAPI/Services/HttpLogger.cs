@@ -61,8 +61,15 @@ namespace GuessMyWordAPI.Services
         }
         public async Task LogAsync(ActionExecutedContext context)
         {
-            var responseObject =
-                JsonConvert.SerializeObject(((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value, Formatting.Indented);
+            string responseObject;
+            if (context.Result != null)
+            {
+                responseObject =
+                    JsonConvert.SerializeObject(((Microsoft.AspNetCore.Mvc.ObjectResult)context.Result).Value, Formatting.Indented);
+            } else
+            {
+                responseObject = "{}";
+            }
             string requestObject = await ReadRequestBodyAsync(context.HttpContext);
             
             var action = (context.ActionDescriptor as ControllerActionDescriptor).ActionName;
