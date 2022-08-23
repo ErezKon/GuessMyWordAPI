@@ -66,11 +66,11 @@ else
     });
 }
 
-builder.WebHost.UseKestrel(kestrel =>
-{
-    kestrel.Listen(IPAddress.Any, 5123);
-    kestrel.Listen(IPAddress.Any, 7123);
-});
+//builder.WebHost.UseKestrel(kestrel =>
+//{
+//    kestrel.Listen(IPAddress.Any, 5123);
+//    kestrel.Listen(IPAddress.Any, 7123);
+//});
 
 var app = builder.Build();
 
