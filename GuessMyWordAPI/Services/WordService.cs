@@ -89,7 +89,37 @@ namespace GuessMyWordAPI.Services
 
         public WordModel GetWordById(long wordId, bool withMetada = false)
         {
+            //var hebrewWordsPath2 = @"C:\Users\Erez_Konforti\source\repos\GuessMyWord\src\assets\he_full.txt";
+            //var words = File.ReadAllLines(hebrewWordsPath2)
+            //    .Select(l =>
+            //    {
+            //        var spl = l.Trim().Split(' ');
+            //        return spl[0];
+            //    })
+            //    .Where(w => w.Length >=3 && w.Length <=9)
+            //    .ToList();
+
             using var context = new WordContext(_config);
+            //var existing = context.Words
+            //    .Where(w => w.Language.Equals("hebrew"))
+            //    .ToList()
+            //    .Distinct()
+            //    .GroupBy(w => w.Word)
+            //    .ToDictionary(k => k.Key, v => v.Key);
+
+            //for (int i = 0; i < words.Count; i++)
+            //{
+            //    var word = words[i];
+            //    if(existing.ContainsKey(word))
+            //    {
+            //        Console.WriteLine($"Word ${word} exist, skipping.");
+            //        continue;
+            //    }
+            //    Console.WriteLine($"Word ${word} does not exist, adding.");
+            //    AddWord("hebrew", word);
+            //}
+            //context.SaveChanges();
+            //using var context = new WordContext(_config);
 #pragma warning disable CS8603 // Possible null reference return.
             return withMetada ?
                 context
